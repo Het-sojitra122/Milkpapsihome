@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Haxiz Business Manager</title>
+
+<!-- PWA & Mobile Meta Tags -->
+<meta name="theme-color" content="#0c0f0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Haxiz Manager">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
@@ -25,7 +36,7 @@
   .sidebar{width:280px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:500;transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);transform:translateX(0)}
   .sidebar-brand{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
   .sidebar-brand h1{font-family:'Outfit',sans-serif;font-weight:800;font-size:18px;color:var(--accent);letter-spacing:-0.5px}
-   .sidebar-brand p{font-size:11px;color:var(--muted);margin-top:2px}
+  .sidebar-brand p{font-size:11px;color:var(--muted);margin-top:2px}
   .sidebar-dev-logo{display:inline-flex;width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--accent2),var(--blue));align-items:center;justify-content:center;margin-right:7px;font-family:'Outfit',sans-serif;font-weight:900;font-size:12px;color:#0c0f0a;letter-spacing:-0.5px;vertical-align:middle;box-shadow:0 2px 8px rgba(74,222,128,0.2)}
   .sidebar-close{display:none;width:36px;height:36px;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:16px;cursor:pointer;transition:all 0.2s;flex-shrink:0}
   .sidebar-close:hover,.sidebar-close:active{background:var(--red-dim);color:var(--red);border-color:rgba(248,113,113,0.3)}
@@ -34,6 +45,827 @@
   .nav-item:hover{background:var(--accent-dim);color:var(--fg2)}
   .nav-item:active{background:rgba(74,222,128,0.15)}
   .nav-item.active{background:var(--accent-dim);color:var(--accent);border-color:var(--border)}
+  .nav-item i{width:20px;text-align:center;font-size:15px}
+  .nav-item .badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;min-width:20px;text-align:center}
+  .nav-divider{height:1px;background:var(--border);margin:8px 14px}
+  .sidebar-footer{padding:14px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:400;cursor:pointer}
+  .sidebar-overlay.show{display:block;animation:overlayIn 0.2s ease}
+  @keyframes overlayIn{from{opacity:0}to{opacity:1}}
+  .main-content{flex:1;margin-left:280px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+  .topbar{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(12,15,10,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0}
+  .topbar-left{min-width:0;flex:1}
+  .topbar-left h2{font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar-left p{font-size:12px;color:var(--muted);margin-top:1px}
+  .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .hamburger{display:none;width:40px;height:40px;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--fg);font-size:18px;cursor:pointer;transition:all 0.15s;flex-shrink:0}
+  .hamburger:hover,.hamburger:active{background:var(--accent-dim);border-color:var(--border2)}
+  .page-content{padding:20px;flex:1}
+  .page{display:none}.page.active{display:block;animation:fadeIn 0.25s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s}
+  .stat-card:active{transform:scale(0.98)}
+  .stat-card .stat-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:10px}
+  .stat-card .stat-value{font-family:'Outfit',sans-serif;font-weight:800;font-size:22px;color:var(--fg);line-height:1;word-break:break-all}
+  .stat-card .stat-label{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.3}
+  .stat-card .stat-sub{font-size:10px;color:var(--muted);margin-top:2px}
+  .stat-card .stat-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:0.12;pointer-events:none}
+  .stat-card.profit-card{border-color:rgba(52,211,153,0.3);background:linear-gradient(135deg,var(--card) 0%,rgba(52,211,153,0.06) 100%)}
+  .stat-card.profit-card .stat-value{color:var(--profit)}
+  .stat-card.loss-card{border-color:rgba(248,113,113,0.3);background:linear-gradient(135deg,var(--card) 0%,rgba(248,113,113,0.06) 100%)}
+  .stat-card.loss-card .stat-value{color:var(--red)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid transparent;transition:all 0.15s;user-select:none;white-space:nowrap;min-height:44px}
+  .btn-primary{background:var(--accent2);color:#0c0f0a}.btn-primary:hover{background:var(--accent)}.btn-primary:active{transform:scale(0.97)}
+  .btn-secondary{background:var(--card2);color:var(--fg2);border-color:var(--border)}.btn-secondary:active{background:var(--border)}
+  .btn-danger{background:var(--red-dim);color:var(--red);border-color:rgba(248,113,113,0.2)}.btn-danger:active{background:rgba(248,113,113,0.25)}
+  .btn-sm{padding:7px 10px;font-size:12px;border-radius:8px;min-height:34px}
+  .btn-icon{width:36px;height:36px;padding:0;min-height:36px}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-size:11px;font-weight:600;color:var(--fg2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
+  .form-control{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--fg);font-size:16px;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;outline:none;min-height:48px;-webkit-appearance:none}
+  .form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+  .form-control::placeholder{color:var(--muted)}
+  select.form-control{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8a70' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+  .toggle-wrap{display:flex;align-items:center;gap:10px}
+  .toggle{width:48px;height:26px;background:var(--border);border-radius:13px;cursor:pointer;position:relative;transition:background 0.3s;flex-shrink:0}
+  .toggle.active{background:var(--accent2)}
+  .toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.3s}
+  .toggle.active::after{transform:translateX(22px)}
+  .toggle-label{font-size:14px;color:var(--fg2)}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+  .section-head h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px}
+  .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .table-header{padding:14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:10px}
+  .table-header h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:15px}
+  .table-actions{display:flex;gap:8px;align-items:stretch}
+  .search-box{position:relative;flex:1;min-width:0}
+  .search-box input{width:100%;padding:9px 12px 9px 32px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;min-height:40px}
+  .search-box input:focus{border-color:var(--accent)}
+  .search-box i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+  .filter-select{width:auto;padding:9px 36px 9px 12px;font-size:13px;min-height:40px;flex-shrink:0;background-color:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--fg);outline:none;font-family:'DM Sans',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8a70' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+  .mobile-cards{display:block}
+  .mobile-card{padding:14px;border-bottom:1px solid var(--border)}.mobile-card:last-child{border-bottom:none}
+  .mobile-card .mc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px}.mobile-card .mc-row:last-child{margin-bottom:0}
+  .mobile-card .mc-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0}
+  .mobile-card .mc-value{font-size:13px;color:var(--fg2);text-align:right;min-width:0;word-break:break-word}
+  .mobile-card .mc-value strong{color:var(--fg)}
+  .mobile-card .mc-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap}.mobile-card .mc-actions .btn{flex:1;min-width:70px}
+  .desktop-table{display:none}
+  .desktop-table table{width:100%;border-collapse:collapse}
+  .desktop-table thead th{padding:12px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--card2)}
+  .desktop-table tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s}.desktop-table tbody tr:last-child{border-bottom:none}.desktop-table tbody tr:hover{background:var(--accent-dim)}
+  .desktop-table tbody td{padding:12px 14px;font-size:13px;color:var(--fg2)}
+  .num-highlight{font-family:'Outfit',sans-serif;font-weight:700}
+  .badge-status{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+  .badge-paid{background:rgba(74,222,128,0.12);color:var(--accent)}.badge-unpaid{background:var(--red-dim);color:var(--red)}
+  .badge-low{background:var(--orange-dim);color:var(--orange)}.badge-ok{background:rgba(74,222,128,0.12);color:var(--accent)}
+  .badge-profit{background:var(--profit-dim);color:var(--profit)}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:1000;display:none;align-items:flex-end;justify-content:center;padding:0}
+  .modal-overlay.show{display:flex;animation:fadeIn 0.2s ease}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:92vh;max-height:92dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1)}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-head{padding:18px 18px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:2;border-radius:20px 20px 0 0}
+  .modal-head h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:17px}
+  .modal-body{padding:0 18px 18px}.modal-foot{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--card);z-index:2}
+  .modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 0}
+  .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+  .quick-action-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:12px;min-height:72px}
+  .quick-action-card:active{transform:scale(0.97);border-color:var(--accent)}
+  .quick-action-card .qa-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .quick-action-card .qa-text h4{font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;color:var(--fg)}
+  .quick-action-card .qa-text p{font-size:11px;color:var(--muted);margin-top:1px}
+  .activity-list{display:flex;flex-direction:column;gap:6px}
+  .activity-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+  .activity-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .activity-item .act-text{flex:1;font-size:12px;color:var(--fg2);min-width:0;line-height:1.4}
+  .activity-item .act-text strong{color:var(--fg)}
+  .activity-item .act-date{font-size:10px;color:var(--muted);flex-shrink:0}
+  .two-col{display:grid;grid-template-columns:1fr;gap:16px}
+  .payment-summary{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:16px}
+  .pay-sum-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .pay-sum-card h4{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+  .pay-sum-card .pay-val{font-family:'Outfit',sans-serif;font-weight:800;font-size:22px}
+  .pay-sum-card .pay-count{font-size:11px;color:var(--muted);margin-top:2px}
+  .stock-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .stock-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .stock-card .sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+  .stock-card .sc-name{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px}
+  .stock-card .sc-qty{font-family:'Outfit',sans-serif;font-weight:800;font-size:20px}
+  .stock-card .sc-qty span{font-size:12px;font-weight:500;color:var(--muted)}
+  .stock-bar-bg{width:100%;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+  .stock-bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
+  .stock-card .sc-meta{margin-top:10px;display:flex;gap:16px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+  .stock-card .sc-profit-row{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .stock-card .sc-profit-label{font-size:11px;color:var(--muted)}
+  .stock-card .sc-profit-val{font-family:'Outfit',sans-serif;font-weight:700;font-size:15px}
+  .empty-state{text-align:center;padding:40px 16px;color:var(--muted)}.empty-state i{font-size:36px;margin-bottom:12px;opacity:0.3}.empty-state p{font-size:13px}
+  .confirm-text{font-size:14px;color:var(--fg2);line-height:1.6;text-align:center;padding:10px 0}
+  .profit-breakdown{margin-top:20px}
+  .pb-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+  .pb-card .pb-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .pb-card .pb-name{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;color:var(--fg)}
+  .pb-card .pb-vals{display:flex;flex-direction:column;gap:4px}
+  .pb-card .pb-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .pb-card .pb-row span:last-child{color:var(--fg2);font-weight:500}
+  .pb-card .pb-total{display:flex;justify-content:space-between;align-items:center;padding-top:8px;margin-top:6px;border-top:1px solid var(--border)}
+  .toast-container{position:fixed;top:10px;left:10px;right:10px;z-index:2000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+  .toast{padding:12px 14px;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;animation:slideDown 0.3s ease;box-shadow:0 8px 30px rgba(0,0,0,0.4);pointer-events:auto;width:100%}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+  .toast-success{background:#1a2e1a;border:1px solid rgba(74,222,128,0.3);color:var(--accent)}
+  .toast-error{background:#2e1a1a;border:1px solid rgba(248,113,113,0.3);color:var(--red)}
+  .toast-info{background:#1a2424;border:1px solid rgba(96,165,250,0.3);color:var(--blue)}
+  @keyframes pulse-soft{0%,100%{opacity:1}50%{opacity:0.6}}.pulse-warn{animation:pulse-soft 2s ease-in-out infinite}
+  .settings-section{margin-bottom:20px}
+  .settings-section-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-left:2px}
+  .settings-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:12px;min-height:52px}
+  .settings-row:last-child{border-bottom:none}
+  .settings-row:active{background:rgba(74,222,128,0.03)}
+  .settings-row-left{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+  .settings-row-left .sr-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .settings-row-left .sr-text h4{font-size:13px;font-weight:600;color:var(--fg);line-height:1.3}
+  .settings-row-left .sr-text p{font-size:11px;color:var(--muted);margin-top:1px;line-height:1.3}
+  .settings-row-right{flex-shrink:0}
+  .settings-input-wrap{width:120px;flex-shrink:0}
+  .settings-input-wrap input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-height:38px;text-align:center}
+  .settings-input-wrap input:focus{border-color:var(--accent)}
+  .danger-zone{border-color:rgba(248,113,113,0.25)}.danger-zone .settings-row-left .sr-icon{background:var(--red-dim);color:var(--red)}
+  .import-drop-zone{border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:12px}
+  .import-drop-zone:hover,.import-drop-zone.drag-over{border-color:var(--accent);background:var(--accent-dim)}
+  .import-drop-zone i{font-size:28px;color:var(--muted);margin-bottom:8px;display:block}
+  .import-drop-zone p{font-size:13px;color:var(--muted);line-height:1.5}
+  .import-drop-zone p strong{color:var(--fg2)}
+  .data-summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+  .ds-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center}
+  .ds-item .ds-val{font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:var(--fg)}
+  .ds-item .ds-label{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.3px}
+  .hidden-input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+  .dev-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 20px;text-align:center;position:relative;overflow:hidden}
+  .dev-card::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:120px;background:radial-gradient(ellipse,rgba(74,222,128,0.08) 0%,transparent 70%);pointer-events:none}
+  .dev-logo{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--accent2),var(--blue));display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'Outfit',sans-serif;font-weight:900;font-size:22px;color:#0c0f0a;letter-spacing:-1px;box-shadow:0 4px 20px rgba(74,222,128,0.2)}
+  .dev-brand{font-family:'Outfit',sans-serif;font-weight:800;font-size:20px;color:var(--fg);margin-bottom:4px}
+  .dev-name{font-size:14px;color:var(--accent);font-weight:600;margin-bottom:12px}
+  .dev-divider{width:40px;height:2px;background:var(--border);margin:0 auto 12px;border-radius:1px}
+  .dev-desc{font-size:12px;color:var(--muted);line-height:1.6;max-width:280px;margin:0 auto}
+  .dev-tag{display:inline-flex;align-items:center;gap:4px;margin-top:14px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(74,222,128,0.15)}
+  .backup-banner{background:var(--gold-dim);border:1px solid rgba(245,197,66,0.25);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+  .backup-banner .bb-row{display:flex;align-items:center;gap:10px}
+  .backup-banner .bb-icon{color:var(--gold);font-size:16px;flex-shrink:0}
+  .backup-banner .bb-text{flex:1;min-width:0}
+  .backup-banner .bb-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:2px}
+  .backup-banner .bb-desc{font-size:12px;color:var(--muted);line-height:1.4}
+  .backup-banner .bb-desc strong{color:var(--fg2)}
+
+  /* Purchase Details Card Custom Styling */
+  .details-card-view{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+  .details-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+  .details-row:last-child{border-bottom:none}
+  .details-label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .details-label i{width:16px;text-align:center;color:var(--fg2)}
+  .details-val{font-size:13px;color:var(--fg);font-weight:600;text-align:right}
+
+  @media(min-width:769px){
+    .sidebar{width:260px}.main-content{margin-left:260px}.page-content{padding:28px 32px}
+    .stats-grid{grid-template-columns:repeat(5,1fr);gap:14px}.stat-card{padding:20px}.stat-card .stat-icon{width:40px;height:40px;font-size:16px;margin-bottom:14px}.stat-card .stat-value{font-size:26px}.stat-card .stat-label{font-size:13px}
+    .quick-actions{gap:12px}.quick-action-card{padding:20px}.two-col{grid-template-columns:1fr 1fr}
+    .payment-summary{grid-template-columns:1fr 1fr;gap:16px}.stock-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .topbar{padding:20px 32px}.topbar-left h2{font-size:22px}.section-head h3{font-size:18px}
+    .modal-overlay{align-items:center;justify-content:center;padding:20px}.modal{border-radius:16px;animation:fadeIn 0.2s ease}.modal-handle{display:none}
+    .modal-head{padding:20px 24px;border-bottom:1px solid var(--border);border-radius:16px 16px 0 0}.modal-body{padding:24px}.modal-foot{padding:16px 24px}
+    .toast-container{top:20px;right:20px;left:auto}.toast{min-width:280px;width:auto;animation:slideIn 0.3s ease}
+    @keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+    .table-header{flex-direction:row;flex-wrap:wrap}.table-actions{flex-wrap:nowrap}.search-box input{width:200px}
+    .mobile-cards{display:none}.desktop-table{display:block}
+    .activity-item .act-text{font-size:13px}.activity-item{padding:12px 16px}
+    .stock-card{padding:20px}.stock-card .sc-name{font-size:16px}.stock-card .sc-qty{font-size:22px}.stock-card .sc-meta{font-size:12px}.stock-bar-bg{height:8px}
+    .profit-breakdown{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}.pb-card{margin-bottom:0}
+    .data-summary-grid{grid-template-columns:repeat(4,1fr)}.settings-row{padding:16px 20px}.settings-input-wrap{width:130px}
+    .dev-card{padding:30px}.dev-logo{width:64px;height:64px;font-size:24px}.dev-brand{font-size:22px}
+  }
+  @media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sidebar-close{display:flex}.main-content{margin-left:0}.hamburger{display:flex}}
+  @media(max-width:360px){.stats-grid{gap:8px}.stat-card{padding:10px}.stat-card .stat-value{font-size:18px}.stat-card .stat-label{font-size:10px}.stat-card .stat-icon{width:28px;height:28px;font-size:12px;margin-bottom:8px}.quick-actions{grid-template-columns:1fr}.page-content{padding:14px 12px}.topbar{padding:10px 12px}.topbar-left h2{font-size:16px}.data-summary-grid{grid-template-columns:1fr 1fr}.settings-input-wrap{width:90px}.dev-card{padding:18px 14px}.dev-logo{width:48px;height:48px;font-size:18px;border-radius:12px}.dev-brand{font-size:18px}.dev-name{font-size:13px}.backup-banner{padding:12px}}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div><h1><span class="sidebar-dev-logo">Hx</span>Haxiz</h1><p>Business Manager</p></div>
+      <button class="sidebar-close" id="sidebarCloseBtn" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</div>
+      <div class="nav-item" data-page="purchases"><i class="fas fa-truck-ramp-box"></i> Purchases</div>
+      <div class="nav-item" data-page="sales"><i class="fas fa-cart-shopping"></i> Sales</div>
+      <div class="nav-item" data-page="stock"><i class="fas fa-warehouse"></i> Stock</div>
+      <div class="nav-item" data-page="payments"><i class="fas fa-money-bill-transfer"></i> Payments<span class="badge" id="paymentBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-page="customers"><i class="fas fa-users"></i> Customers</div>
+      <div class="nav-divider"></div>
+      <div class="nav-item" data-page="settings"><i class="fas fa-gear"></i> Settings</div>
+    </nav>
+    <div class="sidebar-footer"><i class="fas fa-database" style="margin-right:4px"></i> Data saved locally (PWA)</div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1">
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+        <div class="topbar-left"><h2 id="pageTitle">Dashboard</h2><p id="pageSubtitle">Your business at a glance</p></div>
+      </div>
+      <div class="topbar-right"></div>
+    </div>
+    <div class="page-content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid" id="dashStats"></div>
+        <div class="quick-actions">
+          <div class="quick-action-card" id="qaPurchase"><div class="qa-icon" style="background:var(--blue-dim);color:var(--blue)"><i class="fas fa-plus"></i></div><div class="qa-text"><h4>New Purchase</h4><p>Record from wholesaler</p></div></div>
+          <div class="quick-action-card" id="qaSale"><div class="qa-icon" style="background:var(--accent-dim);color:var(--accent)"><i class="fas fa-cash-register"></i></div><div class="qa-text"><h4>New Sale</h4><p>Record to customer</p></div></div>
+        </div>
+        <div class="section-head"><h3>Profit Breakdown</h3></div>
+        <div class="profit-breakdown" id="profitBreakdown"></div>
+        <div class="two-col" style="margin-top:20px">
+          <div><div class="section-head"><h3>Recent Activity</h3></div><div class="activity-list" id="recentActivity"><div class="empty-state" style="padding:24px"><i class="fas fa-clock-rotate-left"></i><p>No activity yet</p></div></div></div>
+          <div><div class="section-head"><h3>Low Stock Alert</h3></div><div id="lowStockAlert"><div class="empty-state" style="padding:24px"><i class="fas fa-triangle-exclamation"></i><p>All stock OK</p></div></div></div>
+        </div>
+      </div>
+
+      <!-- PURCHASES -->
+      <div class="page" id="page-purchases">
+        <div class="section-head"><h3>Purchases</h3><button class="btn btn-primary btn-sm" id="addPurchaseBtn"><i class="fas fa-plus"></i> Add</button></div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>All Purchases</h3><div class="table-actions"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search..." id="purchaseSearch"></div><select class="filter-select" id="purchaseFilter"><option value="all">All</option><option value="paid">Paid</option><option value="unpaid">Unpaid</option></select></div></div>
+          <div class="mobile-cards" id="purchaseMobileCards"></div>
+          <div class="desktop-table"><table><thead><tr><th>Date</th><th>Product</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="purchaseTableBody"></tbody></table></div>
+          <div class="empty-state" id="purchaseEmpty" style="display:none"><i class="fas fa-truck-ramp-box"></i><p>No purchases yet</p></div>
+        </div>
+      </div>
+
+      <!-- SALES -->
+      <div class="page" id="page-sales">
+        <div class="section-head"><h3>Sales</h3><button class="btn btn-primary btn-sm" id="addSaleBtn"><i class="fas fa-plus"></i> Add</button></div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>All Sales</h3><div class="table-actions"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search buyer..." id="saleSearch"></div><select class="filter-select" id="saleFilter"><option value="all">All</option><option value="paid">Paid</option><option value="unpaid">Unpaid</option></select></div></div>
+          <div class="mobile-cards" id="saleMobileCards"></div>
+          <div class="desktop-table"><table><thead><tr><th>Date</th><th>Buyer</th><th>Product</th><th>Qty</th><th>Sale Total</th><th>Profit</th><th>Status</th><th>Actions</th></tr></thead><tbody id="saleTableBody"></tbody></table></div>
+          <div class="empty-state" id="saleEmpty" style="display:none"><i class="fas fa-cart-shopping"></i><p>No sales yet</p></div>
+        </div>
+      </div>
+
+      <!-- STOCK -->
+      <div class="page" id="page-stock">
+        <div class="section-head"><h3>Stock</h3><div style="font-size:12px;color:var(--muted)"><i class="fas fa-circle-info" style="margin-right:3px"></i>Auto-calculated</div></div>
+        <div class="stock-grid" id="stockGrid"></div>
+      </div>
+
+      <!-- PAYMENTS -->
+      <div class="page" id="page-payments">
+        <div class="section-head"><h3>Payments</h3></div>
+        <div class="payment-summary">
+          <div class="pay-sum-card"><h4><i class="fas fa-arrow-down" style="color:var(--red);margin-right:3px"></i> You Owe</h4><div class="pay-val" style="color:var(--red)" id="payOweTotal">0</div><div class="pay-count" id="payOweCount">0 unpaid purchases</div></div>
+          <div class="pay-sum-card"><h4><i class="fas fa-arrow-up" style="color:var(--accent);margin-right:3px"></i> Owed to You</h4><div class="pay-val" style="color:var(--accent)" id="payOwedTotal">0</div><div class="pay-count" id="payOwedCount">0 unpaid sales</div></div>
+        </div>
+        <div class="two-col">
+          <div class="table-wrap"><div class="table-header"><h3>Unpaid Purchases</h3></div><div class="mobile-cards" id="unpaidPurchaseMobile"></div><div class="desktop-table"><table><thead><tr><th>Date</th><th>Product</th><th>Amount</th><th>Action</th></tr></thead><tbody id="unpaidPurchaseBody"></tbody></table></div><div class="empty-state" id="unpaidPurchaseEmpty" style="display:none;padding:24px"><p>All paid</p></div></div>
+          <div class="table-wrap"><div class="table-header"><h3>Unpaid Sales</h3></div><div class="mobile-cards" id="unpaidSaleMobile"></div><div class="desktop-table"><table><thead><tr><th>Date</th><th>Buyer</th><th>Amount</th><th>Action</th></tr></thead><tbody id="unpaidSaleBody"></tbody></table></div><div class="empty-state" id="unpaidSaleEmpty" style="display:none;padding:24px"><p>All collected</p></div></div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS -->
+      <div class="page" id="page-customers">
+        <div class="section-head"><h3>Customers</h3></div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>All Customers</h3><div class="table-actions"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search..." id="customerSearch"></div></div></div>
+          <div class="mobile-cards" id="customerMobileCards"></div>
+          <div class="desktop-table"><table><thead><tr><th>Name</th><th>Purchases</th><th>Spent</th><th>Balance</th></tr></thead><tbody id="customerTableBody"></tbody></table></div>
+          <div class="empty-state" id="customerEmpty" style="display:none"><i class="fas fa-users"></i><p>No customers yet</p></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="backup-banner" id="backupReminder" style="display:none">
+          <div class="bb-row">
+            <i class="fas fa-bell bb-icon"></i>
+            <div class="bb-text">
+              <div class="bb-title">Backup Reminder</div>
+              <div class="bb-desc" id="backupReminderText"></div>
+            </div>
+            <button class="btn btn-sm btn-primary" id="reminderExportBtn" style="flex-shrink:0"><i class="fas fa-download"></i> Export</button>
+          </div>
+        </div>
+
+        <div class="settings-section"><div class="settings-section-title">Data Summary</div><div class="data-summary-grid" id="dataSummaryGrid"></div></div>
+        <div class="settings-section">
+          <div class="settings-section-title">Business Settings</div>
+          <div class="settings-card">
+            <div class="settings-row"><div class="settings-row-left"><div class="sr-icon" style="background:var(--gold-dim);color:var(--gold)"><i class="fas fa-store"></i></div><div class="sr-text"><h4>Business Name</h4><p>Shown in the sidebar</p></div></div><div class="settings-row-right"><div class="settings-input-wrap"><input type="text" id="settingBizName" placeholder="Haxiz Manager"></div></div></div>
+            <div class="settings-row"><div class="settings-row-left"><div class="sr-icon" style="background:var(--blue-dim);color:var(--blue)"><i class="fas fa-indian-rupee-sign"></i></div><div class="sr-text"><h4>Currency Symbol</h4><p>Used for all amounts</p></div></div><div class="settings-row-right"><div class="settings-input-wrap"><input type="text" id="settingCurrency" placeholder="₹" maxlength="3"></div></div></div>
+            <div class="settings-row"><div class="settings-row-left"><div class="sr-icon" style="background:var(--orange-dim);color:var(--orange)"><i class="fas fa-triangle-exclamation"></i></div><div class="sr-text"><h4>Low Stock Alert</h4><p>Alert when stock falls below</p></div></div><div class="settings-row-right"><div class="settings-input-wrap"><input type="number" id="settingLowStock" placeholder="10" min="1" inputmode="numeric"></div></div></div>
+            <div class="settings-row"><div class="settings-row-left"><div class="sr-icon" style="background:var(--accent-dim);color:var(--accent)"><i class="fas fa-save"></i></div><div class="sr-text"><h4>Save Settings</h4><p>Apply your changes</p></div></div><div class="settings-row-right"><button class="btn btn-primary btn-sm" id="saveSettingsBtn"><i class="fas fa-check"></i> Save</button></div></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Data Management</div>
+          <div class="settings-card">
+            <div class="settings-row" id="settingsExportBtn" style="cursor:pointer"><div class="settings-row-left"><div class="sr-icon" style="background:var(--accent-dim);color:var(--accent)"><i class="fas fa-file-arrow-down"></i></div><div class="sr-text"><h4>Export All Data</h4><p>Download backup as JSON file</p></div></div><div class="settings-row-right"><i class="fas fa-chevron-right" style="color:var(--muted);font-size:12px"></i></div></div>
+            <div class="settings-row" id="settingsImportBtn" style="cursor:pointer"><div class="settings-row-left"><div class="sr-icon" style="background:var(--blue-dim);color:var(--blue)"><i class="fas fa-file-arrow-up"></i></div><div class="sr-text"><h4>Import Data</h4><p>Restore from a backup file</p></div></div><div class="settings-row-right"><i class="fas fa-chevron-right" style="color:var(--muted);font-size:12px"></i></div></div>
+            <div class="settings-row"><div class="settings-row-left"><div class="sr-icon" style="background:var(--card2);color:var(--muted)"><i class="fas fa-clock"></i></div><div class="sr-text"><h4>Last Backup</h4><p id="lastBackupDate">Never exported</p></div></div></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title" style="color:var(--red)">Danger Zone</div>
+          <div class="settings-card danger-zone">
+            <div class="settings-row" id="settingsClearSalesBtn" style="cursor:pointer"><div class="settings-row-left"><div class="sr-icon"><i class="fas fa-cart-shopping"></i></div><div class="sr-text"><h4>Clear All Sales</h4><p>Remove every sale record</p></div></div><div class="settings-row-right"><i class="fas fa-chevron-right" style="color:var(--muted);font-size:12px"></i></div></div>
+            <div class="settings-row" id="settingsClearPurchasesBtn" style="cursor:pointer"><div class="settings-row-left"><div class="sr-icon"><i class="fas fa-truck-ramp-box"></i></div><div class="sr-text"><h4>Clear All Purchases</h4><p>Remove every purchase record</p></div></div><div class="settings-row-right"><i class="fas fa-chevron-right" style="color:var(--muted);font-size:12px"></i></div></div>
+            <div class="settings-row" id="settingsResetBtn" style="cursor:pointer"><div class="settings-row-left"><div class="sr-icon"><i class="fas fa-skull-crossbones"></i></div><div class="sr-text"><h4>Reset Everything</h4><p>Delete ALL data and start fresh</p></div></div><div class="settings-row-right"><i class="fas fa-chevron-right" style="color:var(--muted);font-size:12px"></i></div></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">About</div>
+          <div class="settings-card">
+            <div class="settings-row"><div class="settings-row-left"><div class="sr-icon" style="background:var(--card2);color:var(--fg2)"><i class="fas fa-info-circle"></i></div><div class="sr-text"><h4>Version</h4><p>Haxiz Business Manager v2.0 (PWA)</p></div></div></div>
+            <div class="settings-row"><div class="settings-row-left"><div class="sr-icon" style="background:var(--card2);color:var(--fg2)"><i class="fas fa-shield-halved"></i></div><div class="sr-text"><h4>Privacy & Offline</h4><p>Data is stored safely in your device storage.</p></div></div></div>
+          </div>
+        </div>
+        <div class="settings-section" style="margin-bottom:40px">
+          <div class="settings-section-title">Developer</div>
+          <div class="dev-card">
+            <div class="dev-logo">Hx</div>
+            <div class="dev-brand">Haxiz Dev</div>
+            <div class="dev-name">Het Sojitra</div>
+            <div class="dev-divider"></div>
+            <div class="dev-desc">Crafting clean, fast, and reliable mobile-first web applications. Built with care for real-world business needs.</div>
+            <div class="dev-tag"><i class="fas fa-code"></i> Web Developer</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NEW PURCHASE MODAL -->
+<div class="modal-overlay" id="purchaseModal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-head"><h3>New Purchase</h3><button class="btn-icon btn-secondary closeModalBtn" data-modal="purchaseModal"><i class="fas fa-xmark"></i></button></div>
+  <div class="modal-body">
+    <div class="form-group"><label>Product Name</label><input type="text" class="form-control" id="pProductName" placeholder="e.g. Milk Pepsi 250ml" autocomplete="off"></div>
+    <div class="form-group"><label>Quantity (units)</label><input type="number" class="form-control" id="pQty" placeholder="e.g. 100" min="1" inputmode="numeric"></div>
+    <div class="form-group"><label>Purchase Price per Unit</label><input type="number" class="form-control" id="pUnitPrice" placeholder="e.g. 80" min="0" step="0.01" inputmode="decimal"></div>
+    <div class="form-group"><label>Date</label><input type="date" class="form-control" id="pDate"></div>
+    <div class="form-group"><label>Wholesaler Name</label><input type="text" class="form-control" id="pWholesaler" placeholder="e.g. Ali Traders" autocomplete="off"></div>
+    <div class="form-group"><label>Payment Status</label><div class="toggle-wrap"><div class="toggle" id="pPaidToggle"></div><span class="toggle-label" id="pPaidLabel">Unpaid</span></div></div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-secondary closeModalBtn" data-modal="purchaseModal" style="flex:1">Cancel</button><button class="btn btn-primary" id="savePurchaseBtn" style="flex:1"><i class="fas fa-check"></i> Save</button></div>
+</div></div>
+
+<!-- PURCHASE DETAILS MODAL -->
+<div class="modal-overlay" id="purchaseDetailsModal"><div class="modal" style="max-width:440px"><div class="modal-handle"></div>
+  <div class="modal-head"><h3><i class="fas fa-receipt" style="color:var(--accent);margin-right:8px"></i>Purchase Details</h3><button class="btn-icon btn-secondary closeModalBtn" data-modal="purchaseDetailsModal"><i class="fas fa-xmark"></i></button></div>
+  <div class="modal-body" id="purchaseDetailsContent"></div>
+  <div class="modal-foot" id="purchaseDetailsFoot"><button class="btn btn-secondary closeModalBtn" data-modal="purchaseDetailsModal" style="flex:1">Close</button></div>
+</div></div>
+
+<!-- SALE MODAL -->
+<div class="modal-overlay" id="saleModal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-head"><h3>New Sale</h3><button class="btn-icon btn-secondary closeModalBtn" data-modal="saleModal"><i class="fas fa-xmark"></i></button></div>
+  <div class="modal-body">
+    <div class="form-group"><label>Buyer Name</label><input type="text" class="form-control" id="sBuyerName" placeholder="e.g. Ahmed Khan" autocomplete="off"></div>
+    <div class="form-group"><label>Product</label><select class="form-control" id="sProduct"><option value="">Select product</option></select></div>
+    <div class="form-group"><label>Quantity</label><input type="number" class="form-control" id="sQty" placeholder="e.g. 10" min="1" inputmode="numeric"><div id="sStockHint" style="font-size:11px;color:var(--muted);margin-top:4px"></div></div>
+    <div class="form-group"><label>Selling Price per Unit</label><input type="number" class="form-control" id="sUnitPrice" placeholder="e.g. 100" min="0" step="0.01" inputmode="decimal"></div>
+    <div class="form-group"><label>Date</label><input type="date" class="form-control" id="sDate"></div>
+    <div class="form-group"><label>Payment Status</label><div class="toggle-wrap"><div class="toggle" id="sPaidToggle"></div><span class="toggle-label" id="sPaidLabel">Unpaid</span></div></div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-secondary closeModalBtn" data-modal="saleModal" style="flex:1">Cancel</button><button class="btn btn-primary" id="saveSaleBtn" style="flex:1"><i class="fas fa-check"></i> Save</button></div>
+</div></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal"><div class="modal" style="max-width:400px"><div class="modal-handle"></div>
+  <div class="modal-head"><h3 id="confirmTitle">Confirm</h3><button class="btn-icon btn-secondary closeModalBtn" data-modal="confirmModal"><i class="fas fa-xmark"></i></button></div>
+  <div class="modal-body"><p class="confirm-text" id="confirmText">Are you sure?</p></div>
+  <div class="modal-foot"><button class="btn btn-secondary closeModalBtn" data-modal="confirmModal" style="flex:1">Cancel</button><button class="btn btn-danger" id="confirmBtn" style="flex:1">Confirm</button></div>
+</div></div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-head"><h3>Import Data</h3><button class="btn-icon btn-secondary closeModalBtn" data-modal="importModal"><i class="fas fa-xmark"></i></button></div>
+  <div class="modal-body">
+    <div class="import-drop-zone" id="importDropZone"><i class="fas fa-cloud-arrow-up"></i><p><strong>Tap to select file</strong></p><p>or drag & drop a JSON backup file</p></div>
+    <input type="file" accept=".json" class="hidden-input" id="importFileInput">
+    <div style="font-size:12px;color:var(--muted);line-height:1.5"><i class="fas fa-circle-info" style="margin-right:3px"></i>Importing will <strong style="color:var(--gold)">merge</strong> with existing data. Duplicates are skipped.</div>
+  </div>
+</div></div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SERVICE WORKER REGISTRATION -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js')
+        .then(function(reg) {
+          console.log('[PWA] Service Worker registered:', reg.scope);
+        })
+        .catch(function(err) {
+          console.warn('[PWA] Service Worker registration failed:', err);
+        });
+    });
+  }
+</script>
+
+<script>
+(function(){
+  var SK='milkpepsi_data',SSK='milkpepsi_settings';
+  function ld(){try{var r=localStorage.getItem(SK);if(r)return JSON.parse(r);}catch(e){}return{purchases:[],sales:[],products:[]};}
+  function sv(){localStorage.setItem(SK,JSON.stringify(D));}
+  function ls(){try{var r=localStorage.getItem(SSK);if(r)return JSON.parse(r);}catch(e){}return{bizName:'Haxiz Manager',currency:'₹',lowStock:10};}
+  function ss(){localStorage.setItem(SSK,JSON.stringify(S));}
+  var D=ld(),S=ls();
+
+  function gid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+  function cur(){return S.currency||'₹';}
+  function fm(n){return n==null?'0':cur()+Number(n).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0});}
+  function fd(d){if(!d)return'Not provided';var t=new Date(d+'T00:00:00');if(isNaN(t.getTime()))return d;return t.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+  function td(){return new Date().toISOString().split('T')[0];}
+  function es(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+  function ep(n){if(!n)return;if(!D.products.find(function(p){return p.name.toLowerCase()===n.toLowerCase();})){D.products.push({id:gid(),name:n,createdAt:td()});sv();}}
+  function so(pn){var n=pn.toLowerCase(),i=0,o=0;D.purchases.forEach(function(p){if(p.product.toLowerCase()===n)i+=Number(p.qty);});D.sales.forEach(function(s){if(s.product.toLowerCase()===n)o+=Number(s.qty);});return i-o;}
+  function ac(pn){var n=pn.toLowerCase(),tc=0,tq=0;D.purchases.forEach(function(p){if(p.product.toLowerCase()===n){tc+=p.total;tq+=p.qty;}});return tq>0?tc/tq:0;}
+  function sp(sale){return(sale.unitPrice-ac(sale.product))*sale.qty;}
+  function tp(){var p=0;D.sales.forEach(function(s){p+=sp(s);});return p;}
+  function tcogs(){var c=0;D.sales.forEach(function(s){c+=ac(s.product)*s.qty;});return c;}
+  function pbp(){var map={};D.sales.forEach(function(s){var n=s.product.toLowerCase();if(!map[n])map[n]={name:s.product,soldQty:0,revenue:0,cost:0,profit:0};var c=ac(s.product);map[n].soldQty+=s.qty;map[n].revenue+=s.total;map[n].cost+=c*s.qty;map[n].profit+=(s.unitPrice-c)*s.qty;});return Object.values(map);}
+
+  // Safe purchase details helper (fully backward compatible)
+  function getPurchaseDetails(p){
+    var total = p.total != null ? Number(p.total) : ((p.qty && p.unitPrice) ? Number(p.qty) * Number(p.unitPrice) : 0);
+    var isPaid = !!p.paid;
+    var paidAmt = p.amountPaid != null ? Number(p.amountPaid) : (isPaid ? total : 0);
+    var dueAmt = p.amountDue != null ? Number(p.amountDue) : Math.max(0, total - paidAmt);
+    return {
+      product: p.product || 'Not provided',
+      qty: p.qty != null ? p.qty : 'Not provided',
+      unitPrice: p.unitPrice != null ? p.unitPrice : 'Not provided',
+      total: total,
+      wholesaler: (p.wholesaler && p.wholesaler.trim()) ? p.wholesaler.trim() : 'Not provided',
+      date: p.date || 'Not provided',
+      paid: isPaid,
+      amountPaid: paidAmt,
+      amountDue: dueAmt
+    };
+  }
+
+  function toast(msg,type){type=type||'success';var c=document.getElementById('toastContainer'),t=document.createElement('div');t.className='toast toast-'+type;var ic={success:'fa-check-circle',error:'fa-circle-exclamation',info:'fa-circle-info'};t.innerHTML='<i class="fas '+(ic[type]||ic.info)+'"></i> '+msg;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(-20px)';t.style.transition='all 0.3s';setTimeout(function(){t.remove();},300);},3000);}
+
+  var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
+  function osb(){sb.classList.add('open');ov.classList.add('show');document.body.style.overflow='hidden';}
+  function csb(){sb.classList.remove('open');ov.classList.remove('show');document.body.style.overflow='';}
+  document.getElementById('hamburgerBtn').addEventListener('click',function(e){e.stopPropagation();osb();});
+  document.getElementById('sidebarCloseBtn').addEventListener('click',function(e){e.stopPropagation();csb();});
+  ov.addEventListener('click',function(e){e.stopPropagation();csb();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){csb();cam();}});
+  function updateBrand(){document.querySelector('.sidebar-brand h1').innerHTML='<span class="sidebar-dev-logo">Hx</span>'+es(S.bizName||'Haxiz');}
+
+  var titles={dashboard:['Dashboard','Your business at a glance'],purchases:['Purchases','Stock from wholesaler'],sales:['Sales','Customer sales'],stock:['Stock','Real-time inventory'],payments:['Payments','Pending payments'],customers:['Customers','Customer directory'],settings:['Settings','Manage your app & data']};
+  function go(p){
+    document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+    document.getElementById('page-'+p).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
+    var a=document.querySelector('.nav-item[data-page="'+p+'"]');if(a)a.classList.add('active');
+    document.getElementById('pageTitle').textContent=titles[p][0];
+    document.getElementById('pageSubtitle').textContent=titles[p][1];
+    var fn2={dashboard:rDash,purchases:rPur,sales:rSal,stock:rStk,payments:rPay,customers:rCus,settings:rSet};
+    if(fn2[p])fn2[p]();csb();
+  }
+  document.getElementById('sidebarNav').addEventListener('click',function(e){var n=e.target.closest('.nav-item');if(n&&n.dataset.page)go(n.dataset.page);});
+
+  function om(id){document.getElementById(id).classList.add('show');if(id==='purchaseModal')rpf();if(id==='saleModal')rsf();}
+  function cm(id){document.getElementById(id).classList.remove('show');}
+  function cam(){document.querySelectorAll('.modal-overlay').forEach(function(m){m.classList.remove('show');});}
+  document.querySelectorAll('.modal-overlay').forEach(function(o){o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});});
+  document.querySelectorAll('.closeModalBtn').forEach(function(b){b.addEventListener('click',function(){var m=this.getAttribute('data-modal');if(m)cm(m);});});
+
+  function tg(id){var e=document.getElementById(id);e.classList.toggle('active');var l=document.getElementById(id.replace('Toggle','Label'));if(l)l.textContent=e.classList.contains('active')?'Paid':'Unpaid';}
+  document.getElementById('pPaidToggle').addEventListener('click',function(){tg('pPaidToggle');});
+  document.getElementById('sPaidToggle').addEventListener('click',function(){tg('sPaidToggle');});
+
+  function rpf(){document.getElementById('pProductName').value='';document.getElementById('pQty').value='';document.getElementById('pUnitPrice').value='';document.getElementById('pDate').value=td();document.getElementById('pWholesaler').value='';document.getElementById('pPaidToggle').classList.remove('active');document.getElementById('pPaidLabel').textContent='Unpaid';}
+  document.getElementById('savePurchaseBtn').addEventListener('click',function(){
+    var pr=document.getElementById('pProductName').value.trim(),q=parseInt(document.getElementById('pQty').value),up=parseFloat(document.getElementById('pUnitPrice').value),dt=document.getElementById('pDate').value,wh=document.getElementById('pWholesaler').value.trim(),pa=document.getElementById('pPaidToggle').classList.contains('active');
+    if(!pr){toast('Enter product name','error');return;}if(!q||q<1){toast('Enter valid quantity','error');return;}if(isNaN(up)||up<0){toast('Enter valid price','error');return;}if(!dt){toast('Select date','error');return;}
+    var tot=q*up;
+    ep(pr);
+    D.purchases.push({
+      id:gid(),
+      product:pr,
+      qty:q,
+      unitPrice:up,
+      total:tot,
+      date:dt,
+      wholesaler:wh,
+      paid:pa,
+      amountPaid:pa?tot:0,
+      amountDue:pa?0:tot,
+      createdAt:new Date().toISOString()
+    });
+    sv();cm('purchaseModal');toast('Purchased '+q+' units at '+fm(up)+' each');rPur();ub();
+  });
+
+  function rsf(){document.getElementById('sBuyerName').value='';document.getElementById('sQty').value='';document.getElementById('sUnitPrice').value='';document.getElementById('sDate').value=td();document.getElementById('sStockHint').textContent='';document.getElementById('sPaidToggle').classList.remove('active');document.getElementById('sPaidLabel').textContent='Unpaid';fpd();}
+  function fpd(){var s=document.getElementById('sProduct');s.innerHTML='<option value="">Select product</option>';D.products.forEach(function(p){var st=so(p.name),o=document.createElement('option');o.value=p.name;o.textContent=p.name+' ('+st+' in stock)';if(st<=0)o.disabled=true;s.appendChild(o);});}
+  document.getElementById('sProduct').addEventListener('change',function(){var h=document.getElementById('sStockHint');if(this.value){var st=so(this.value),c=ac(this.value);h.innerHTML='Stock: <strong>'+st+'</strong> &middot; Cost: <strong>'+fm(c)+'</strong>/unit';h.style.color=st<=S.lowStock?'var(--orange)':'var(--muted)';}else h.textContent='';});
+  document.getElementById('saveSaleBtn').addEventListener('click',function(){
+    var by=document.getElementById('sBuyerName').value.trim(),pr=document.getElementById('sProduct').value,q=parseInt(document.getElementById('sQty').value),up=parseFloat(document.getElementById('sUnitPrice').value),dt=document.getElementById('sDate').value,pa=document.getElementById('sPaidToggle').classList.contains('active');
+    if(!by){toast('Enter buyer name','error');return;}if(!pr){toast('Select a product','error');return;}if(!q||q<1){toast('Enter valid quantity','error');return;}if(isNaN(up)||up<0){toast('Enter valid price','error');return;}if(!dt){toast('Select date','error');return;}
+    var st=so(pr);if(q>st){toast('Only '+st+' units available','error');return;}
+    var c=ac(pr),prof=(up-c)*q;
+    D.sales.push({id:gid(),buyer:by,product:pr,qty:q,unitPrice:up,total:q*up,date:dt,paid:pa,createdAt:new Date().toISOString()});
+    sv();cm('saleModal');toast('Sold '+q+' units &middot; '+(prof>=0?'Profit':'Loss')+': '+fm(Math.abs(prof)));rSal();ub();
+  });
+
+  function sb2(p){return'<span class="badge-status '+(p?'badge-paid':'badge-unpaid')+'"><i class="fas '+(p?'fa-circle-check':'fa-clock')+'"></i> '+(p?'Paid':'Unpaid')+'</span>';}
+  function pb2(v){var c=v>=0?'var(--profit)':'var(--loss)',s=v>=0?'+':'';return'<span class="num-highlight" style="color:'+c+'">'+s+fm(v)+'</span>';}
+
+  /* RENDER PURCHASES WITH VIEW DETAILS BUTTON */
+  function rPur(){
+    var sr=(document.getElementById('purchaseSearch').value||'').toLowerCase(),fl=document.getElementById('purchaseFilter').value,l=D.purchases.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    if(sr)l=l.filter(function(p){return p.product.toLowerCase().indexOf(sr)!==-1||(p.wholesaler&&p.wholesaler.toLowerCase().indexOf(sr)!==-1);});
+    if(fl==='paid')l=l.filter(function(p){return p.paid;});if(fl==='unpaid')l=l.filter(function(p){return !p.paid;});
+    var mc=document.getElementById('purchaseMobileCards'),dt=document.getElementById('purchaseTableBody'),em=document.getElementById('purchaseEmpty');
+    if(!l.length){mc.innerHTML='';dt.innerHTML='';em.style.display='block';return;}em.style.display='none';
+    
+    mc.innerHTML=l.map(function(p){
+      return '<div class="mobile-card">'
+        +'<div class="mc-row"><span class="mc-label">Date</span><span class="mc-value">'+fd(p.date)+'</span></div>'
+        +'<div class="mc-row"><span class="mc-label">Product</span><span class="mc-value"><strong>'+es(p.product)+'</strong></span></div>'
+        +'<div class="mc-row"><span class="mc-label">Qty x Cost</span><span class="mc-value">'+p.qty+' x '+fm(p.unitPrice)+'</span></div>'
+        +'<div class="mc-row"><span class="mc-label">Total</span><span class="mc-value num-highlight" style="color:var(--gold)">'+fm(p.total)+'</span></div>'
+        +'<div class="mc-row"><span class="mc-label">Status</span><span class="mc-value">'+sb2(p.paid)+'</span></div>'
+        +'<div class="mc-actions">'
+          +'<button class="btn btn-sm btn-secondary vpd" data-id="'+p.id+'"><i class="fas fa-eye"></i> View Details</button>'
+          +(!p.paid?'<button class="btn btn-sm btn-secondary mpp" data-id="'+p.id+'"><i class="fas fa-check"></i> Paid</button>':'')
+          +'<button class="btn btn-sm btn-danger dp" data-id="'+p.id+'"><i class="fas fa-trash"></i> Delete</button>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+
+    dt.innerHTML=l.map(function(p){
+      return '<tr>'
+        +'<td>'+fd(p.date)+'</td>'
+        +'<td><strong style="color:var(--fg)">'+es(p.product)+'</strong></td>'
+        +'<td>'+p.qty+'</td>'
+        +'<td>'+fm(p.unitPrice)+'</td>'
+        +'<td class="num-highlight" style="color:var(--gold)">'+fm(p.total)+'</td>'
+        +'<td>'+sb2(p.paid)+'</td>'
+        +'<td><div style="display:flex;gap:6px">'
+          +'<button class="btn btn-sm btn-secondary vpd" data-id="'+p.id+'" title="View Details"><i class="fas fa-eye"></i> Details</button>'
+          +(!p.paid?'<button class="btn btn-sm btn-secondary mpp" data-id="'+p.id+'" title="Mark as Paid"><i class="fas fa-check"></i></button>':'')
+          +'<button class="btn btn-sm btn-danger dp" data-id="'+p.id+'" title="Delete"><i class="fas fa-trash"></i></button>'
+        +'</div></td>'
+      +'</tr>';
+    }).join('');
+  }
+
+  /* VIEW PURCHASE DETAILS MODAL BUILDER */
+  function showPurchaseDetails(id){
+    var p=D.purchases.find(function(x){return x.id===id;});
+    if(!p){toast('Purchase record not found','error');return;}
+    var info=getPurchaseDetails(p);
+
+    var html='<div class="details-card-view">'
+      +'<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px"><i class="fas fa-box" style="margin-right:4px"></i>Product Name</div>'
+      +'<div style="font-family:\'Outfit\',sans-serif;font-weight:700;font-size:18px;color:var(--fg);word-break:break-word">'+es(info.product)+'</div>'
+    +'</div>'
+    +'<div class="details-card-view" style="padding:4px 14px">'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-cubes"></i> Quantity</span><span class="details-val">'+info.qty+(typeof info.qty==='number'?' units':'')+'</span></div>'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-tag"></i> Purchase Price / Unit</span><span class="details-val">'+(typeof info.unitPrice==='number'?fm(info.unitPrice):info.unitPrice)+'</span></div>'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-coins"></i> Total Purchase</span><span class="details-val num-highlight" style="color:var(--gold);font-size:16px">'+fm(info.total)+'</span></div>'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-store"></i> Wholesaler / Supplier</span><span class="details-val">'+es(info.wholesaler)+'</span></div>'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-calendar-day"></i> Purchase Date</span><span class="details-val">'+fd(info.date)+'</span></div>'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-credit-card"></i> Payment Status</span><span class="details-val">'+sb2(info.paid)+'</span></div>'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-hand-holding-dollar"></i> Amount Paid</span><span class="details-val num-highlight" style="color:var(--accent)">'+fm(info.amountPaid)+'</span></div>'
+      +'<div class="details-row"><span class="details-label"><i class="fas fa-file-invoice-dollar"></i> Amount Due</span><span class="details-val num-highlight" style="color:'+(info.amountDue>0?'var(--red)':'var(--profit)')+';font-size:15px">'+fm(info.amountDue)+'</span></div>'
+    +'</div>';
+
+    document.getElementById('purchaseDetailsContent').innerHTML=html;
+
+    var foot=document.getElementById('purchaseDetailsFoot');
+    if(!info.paid){
+      foot.innerHTML='<button class="btn btn-primary" id="detailMarkPaidBtn" style="flex:1"><i class="fas fa-check"></i> Mark as Paid</button><button class="btn btn-secondary closeModalBtn" data-modal="purchaseDetailsModal" style="flex:1">Close</button>';
+      document.getElementById('detailMarkPaidBtn').onclick=function(){
+        mpp(p.id);
+        cm('purchaseDetailsModal');
+      };
+    } else {
+      foot.innerHTML='<button class="btn btn-secondary closeModalBtn" data-modal="purchaseDetailsModal" style="flex:1">Close</button>';
+    }
+
+    foot.querySelectorAll('.closeModalBtn').forEach(function(b){
+      b.addEventListener('click',function(){cm('purchaseDetailsModal');});
+    });
+
+    om('purchaseDetailsModal');
+  }
+
+  document.getElementById('purchaseMobileCards').addEventListener('click',pa2);
+  document.getElementById('purchaseTableBody').addEventListener('click',pa2);
+  function pa2(e){
+    var vb=e.target.closest('.vpd');if(vb){showPurchaseDetails(vb.getAttribute('data-id'));return;}
+    var b=e.target.closest('.mpp');if(b){mpp(b.getAttribute('data-id'));return;}
+    b=e.target.closest('.dp');if(b){cd('purchase',b.getAttribute('data-id'));}
+  }
+
+  function rSal(){
+    var sr=(document.getElementById('saleSearch').value||'').toLowerCase(),fl=document.getElementById('saleFilter').value,l=D.sales.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    if(sr)l=l.filter(function(s){return s.buyer.toLowerCase().indexOf(sr)!==-1||s.product.toLowerCase().indexOf(sr)!==-1;});
+    if(fl==='paid')l=l.filter(function(s){return s.paid;});if(fl==='unpaid')l=l.filter(function(s){return !s.paid;});
+    var mc=document.getElementById('saleMobileCards'),dt=document.getElementById('saleTableBody'),em=document.getElementById('saleEmpty');
+    if(!l.length){mc.innerHTML='';dt.innerHTML='';em.style.display='block';return;}em.style.display='none';
+    mc.innerHTML=l.map(function(s){var pr=sp(s);return'<div class="mobile-card"><div class="mc-row"><span class="mc-label">Date</span><span class="mc-value">'+fd(s.date)+'</span></div><div class="mc-row"><span class="mc-label">Buyer</span><span class="mc-value"><strong>'+es(s.buyer)+'</strong></span></div><div class="mc-row"><span class="mc-label">Product</span><span class="mc-value">'+es(s.product)+'</span></div><div class="mc-row"><span class="mc-label">Qty x Price</span><span class="mc-value">'+s.qty+' x '+fm(s.unitPrice)+'</span></div><div class="mc-row"><span class="mc-label">Total</span><span class="mc-value num-highlight" style="color:var(--accent)">'+fm(s.total)+'</span></div><div class="mc-row"><span class="mc-label">Profit</span><span class="mc-value">'+pb2(pr)+'</span></div><div class="mc-row"><span class="mc-label">Status</span><span class="mc-value">'+sb2(s.paid)+'</span></div><div class="mc-actions">'+(!s.paid?'<button class="btn btn-sm btn-secondary msp" data-id="'+s.id+'"><i class="fas fa-check"></i> Paid</button>':'')+'<button class="btn btn-sm btn-danger ds" data-id="'+s.id+'"><i class="fas fa-trash"></i> Delete</button></div></div>';}).join('');
+    dt.innerHTML=l.map(function(s){var pr=sp(s);return'<tr><td>'+fd(s.date)+'</td><td><strong style="color:var(--fg)">'+es(s.buyer)+'</strong></td><td>'+es(s.product)+'</td><td>'+s.qty+'</td><td class="num-highlight" style="color:var(--accent)">'+fm(s.total)+'</td><td>'+pb2(pr)+'</td><td>'+sb2(s.paid)+'</td><td><div style="display:flex;gap:6px">'+(!s.paid?'<button class="btn btn-sm btn-secondary msp" data-id="'+s.id+'"><i class="fas fa-check"></i></button>':'')+'<button class="btn btn-sm btn-danger ds" data-id="'+s.id+'"><i class="fas fa-trash"></i></button></div></td></tr>';}).join('');
+  }
+  document.getElementById('saleMobileCards').addEventListener('click',sa2);document.getElementById('saleTableBody').addEventListener('click',sa2);
+  function sa2(e){var b=e.target.closest('.msp');if(b){msp(b.getAttribute('data-id'));return;}b=e.target.closest('.ds');if(b){cd('sale',b.getAttribute('data-id'));}}
+
+  function rStk(){
+    var g=document.getElementById('stockGrid'),ps=D.products,ls=S.lowStock||10;
+    if(!ps.length){g.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-warehouse"></i><p>No products yet</p></div>';return;}
+    var mx=0;ps.forEach(function(p){var s=so(p.name);if(s>mx)mx=s;});if(!mx)mx=1;
+    g.innerHTML=ps.map(function(p){var st=so(p.name),pct=Math.max(0,Math.min(100,st/mx*100)),low=st<=ls&&st>0,empty=st<=0,bc='var(--accent)',sbb='<span class="badge-status badge-ok"><i class="fas fa-circle-check"></i> In Stock</span>';if(empty){bc='var(--red)';sbb='<span class="badge-status badge-unpaid pulse-warn"><i class="fas fa-circle-xmark"></i> Out</span>';}else if(low){bc='var(--orange)';sbb='<span class="badge-status badge-low pulse-warn"><i class="fas fa-triangle-exclamation"></i> Low</span>';}var ti=D.purchases.filter(function(x){return x.product.toLowerCase()===p.name.toLowerCase();}).reduce(function(s,x){return s+x.qty;},0);var to2=D.sales.filter(function(x){return x.product.toLowerCase()===p.name.toLowerCase();}).reduce(function(s,x){return s+x.qty;},0);var av=ac(p.name),pp=pbp().find(function(x){return x.name.toLowerCase()===p.name.toLowerCase();}),pv=pp?pp.profit:0,pc=pv>=0?'var(--profit)':'var(--loss)',ps2=pv>=0?'+':'';return'<div class="stock-card" style="'+(empty?'border-color:rgba(248,113,113,0.3)':'')+'"><div class="sc-top"><span class="sc-name">'+es(p.name)+'</span>'+sbb+'</div><div class="sc-qty">'+st+' <span>units</span></div><div style="margin-top:8px"><div class="stock-bar-bg"><div class="stock-bar-fill" style="width:'+pct+'%;background:'+bc+'"></div></div></div><div class="sc-meta"><span><i class="fas fa-arrow-down" style="margin-right:3px;color:var(--blue)"></i>In: '+ti+'</span><span><i class="fas fa-arrow-up" style="margin-right:3px;color:var(--orange)"></i>Out: '+to2+'</span><span><i class="fas fa-tag" style="margin-right:3px"></i>Cost: '+fm(av)+'</span></div>'+(pp?'<div class="sc-profit-row"><span class="sc-profit-label">Profit</span><span class="sc-profit-val" style="color:'+pc+'">'+ps2+fm(pv)+'</span></div>':'')+'</div>';}).join('');
+  }
+
+  function rPay(){
+    var up=D.purchases.filter(function(p){return !p.paid;}).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    var us=D.sales.filter(function(s){return !s.paid;}).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    document.getElementById('payOweTotal').textContent=fm(up.reduce(function(s,p){return s+p.total;},0));
+    document.getElementById('payOweCount').textContent=up.length+' unpaid purchase'+(up.length!==1?'s':'');
+    document.getElementById('payOwedTotal').textContent=fm(us.reduce(function(s,x){return s+x.total;},0));
+    document.getElementById('payOwedCount').textContent=us.length+' unpaid sale'+(us.length!==1?'s':'');
+    var upm=document.getElementById('unpaidPurchaseMobile'),upt=document.getElementById('unpaidPurchaseBody'),upe=document.getElementById('unpaidPurchaseEmpty');
+    if(!up.length){upm.innerHTML='';upt.innerHTML='';upe.style.display='block';}else{upe.style.display='none';upm.innerHTML=up.map(function(p){return'<div class="mobile-card"><div class="mc-row"><span class="mc-label">Date</span><span class="mc-value">'+fd(p.date)+'</span></div><div class="mc-row"><span class="mc-label">Product</span><span class="mc-value"><strong>'+es(p.product)+'</strong></span></div><div class="mc-row"><span class="mc-label">Amount</span><span class="mc-value num-highlight" style="color:var(--red)">'+fm(p.total)+'</span></div><div class="mc-actions"><button class="btn btn-sm btn-primary mpp" data-id="'+p.id+'" style="flex:1"><i class="fas fa-check"></i> Mark Paid</button></div></div>';}).join('');upt.innerHTML=up.map(function(p){return'<tr><td>'+fd(p.date)+'</td><td>'+es(p.product)+'</td><td class="num-highlight" style="color:var(--red)">'+fm(p.total)+'</td><td><button class="btn btn-sm btn-primary mpp" data-id="'+p.id+'"><i class="fas fa-check"></i> Pay</button></td></tr>';}).join('');}
+    var usm=document.getElementById('unpaidSaleMobile'),ust=document.getElementById('unpaidSaleBody'),use=document.getElementById('unpaidSaleEmpty');
+    if(!us.length){usm.innerHTML='';ust.innerHTML='';use.style.display='block';}else{use.style.display='none';usm.innerHTML=us.map(function(s){return'<div class="mobile-card"><div class="mc-row"><span class="mc-label">Date</span><span class="mc-value">'+fd(s.date)+'</span></div><div class="mc-row"><span class="mc-label">Buyer</span><span class="mc-value"><strong>'+es(s.buyer)+'</strong></span></div><div class="mc-row"><span class="mc-label">Amount</span><span class="mc-value num-highlight" style="color:var(--accent)">'+fm(s.total)+'</span></div><div class="mc-actions"><button class="btn btn-sm btn-primary msp" data-id="'+s.id+'" style="flex:1"><i class="fas fa-check"></i> Mark Collected</button></div></div>';}).join('');ust.innerHTML=us.map(function(s){return'<tr><td>'+fd(s.date)+'</td><td>'+es(s.buyer)+'</td><td class="num-highlight" style="color:var(--accent)">'+fm(s.total)+'</td><td><button class="btn btn-sm btn-primary msp" data-id="'+s.id+'"><i class="fas fa-check"></i> Collect</button></td></tr>';}).join('');}
+  }
+  document.getElementById('unpaidPurchaseMobile').addEventListener('click',function(e){var b=e.target.closest('.mpp');if(b)mpp(b.getAttribute('data-id'));});
+  document.getElementById('unpaidPurchaseBody').addEventListener('click',function(e){var b=e.target.closest('.mpp');if(b)mpp(b.getAttribute('data-id'));});
+  document.getElementById('unpaidSaleMobile').addEventListener('click',function(e){var b=e.target.closest('.msp');if(b)msp(b.getAttribute('data-id'));});
+  document.getElementById('unpaidSaleBody').addEventListener('click',function(e){var b=e.target.closest('.msp');if(b)msp(b.getAttribute('data-id'));});
+
+  function rCus(){
+    var sr=(document.getElementById('customerSearch').value||'').toLowerCase(),map={};
+    D.sales.forEach(function(s){var n=s.buyer.toLowerCase();if(!map[n])map[n]={name:s.buyer,totalQty:0,totalSpent:0,unpaid:0,purchases:0};map[n].totalQty+=s.qty;map[n].totalSpent+=s.total;map[n].purchases++;if(!s.paid)map[n].unpaid+=s.total;});
+    var list=Object.values(map).sort(function(a,b){return b.totalSpent-a.totalSpent;});
+    if(sr)list=list.filter(function(c){return c.name.toLowerCase().indexOf(sr)!==-1;});
+    var mc=document.getElementById('customerMobileCards'),dt=document.getElementById('customerTableBody'),em=document.getElementById('customerEmpty');
+    if(!list.length){mc.innerHTML='';dt.innerHTML='';em.style.display='block';return;}em.style.display='none';
+    mc.innerHTML=list.map(function(c){return'<div class="mobile-card"><div class="mc-row"><span class="mc-label">Name</span><span class="mc-value"><strong>'+es(c.name)+'</strong></span></div><div class="mc-row"><span class="mc-label">Orders</span><span class="mc-value">'+c.purchases+' ('+c.totalQty+')</span></div><div class="mc-row"><span class="mc-label">Spent</span><span class="mc-value num-highlight" style="color:var(--gold)">'+fm(c.totalSpent)+'</span></div><div class="mc-row"><span class="mc-label">Balance</span><span class="mc-value">'+(c.unpaid>0?'<span class="badge-status badge-unpaid"><i class="fas fa-clock"></i> '+fm(c.unpaid)+'</span>':'<span class="badge-status badge-paid"><i class="fas fa-circle-check"></i> Clear</span>')+'</span></div></div>';}).join('');
+    dt.innerHTML=list.map(function(c){return'<tr><td><strong style="color:var(--fg)">'+es(c.name)+'</strong></td><td>'+c.purchases+' ('+c.totalQty+')</td><td class="num-highlight" style="color:var(--gold)">'+fm(c.totalSpent)+'</td><td>'+(c.unpaid>0?'<span class="badge-status badge-unpaid"><i class="fas fa-clock"></i> '+fm(c.unpaid)+'</span>':'<span class="badge-status badge-paid"><i class="fas fa-circle-check"></i> Clear</span>')+'</td></tr>';}).join('');
+  }
+
+  function rDash(){
+    var ts=0;D.products.forEach(function(p){ts+=so(p.name);});
+    var tr=D.sales.reduce(function(s,x){return s+x.total;},0);
+    var rec=D.sales.filter(function(s){return !s.paid;}).reduce(function(s,x){return s+x.total;},0);
+    var pay=D.purchases.filter(function(p){return !p.paid;}).reduce(function(s,x){return s+x.total;},0);
+    var tprof=tp(),cogs=tcogs(),tpP=tprof>=0,mg=tr>0?((tprof/tr)*100).toFixed(1):'0';
+    document.getElementById('dashStats').innerHTML='<div class="stat-card '+(tpP?'profit-card':'loss-card')+'"><div class="stat-glow" style="background:'+(tpP?'var(--profit)':'var(--loss)')+'"></div><div class="stat-icon" style="background:'+(tpP?'var(--profit-dim)':'var(--red-dim)')+';color:'+(tpP?'var(--profit)':'var(--loss')+'"><i class="fas '+(tpP?'fa-arrow-trend-up':'fa-arrow-trend-down')+'"></i></div><div class="stat-value">'+(tpP?'+':'')+fm(tprof)+'</div><div class="stat-label">Total Profit</div><div class="stat-sub">'+mg+'% margin</div></div><div class="stat-card"><div class="stat-glow" style="background:var(--gold)"></div><div class="stat-icon" style="background:var(--gold-dim);color:var(--gold)"><i class="fas fa-coins"></i></div><div class="stat-value">'+fm(tr)+'</div><div class="stat-label">Revenue</div></div><div class="stat-card"><div class="stat-glow" style="background:var(--red)"></div><div class="stat-icon" style="background:var(--red-dim);color:var(--red)"><i class="fas fa-receipt"></i></div><div class="stat-value">'+fm(cogs)+'</div><div class="stat-label">Cost of Goods</div></div><div class="stat-card"><div class="stat-glow" style="background:var(--red)"></div><div class="stat-icon" style="background:var(--red-dim);color:var(--red)"><i class="fas fa-hand-holding-dollar"></i></div><div class="stat-value">'+fm(rec)+'</div><div class="stat-label">To Receive</div></div><div class="stat-card"><div class="stat-glow" style="background:var(--orange)"></div><div class="stat-icon" style="background:var(--orange-dim);color:var(--orange)"><i class="fas fa-file-invoice-dollar"></i></div><div class="stat-value">'+fm(pay)+'</div><div class="stat-label">To Pay</div></div>';
+    var pb=pbp(),pbc=document.getElementById('profitBreakdown');
+    if(!pb.length){pbc.innerHTML='<div class="empty-state" style="padding:24px"><i class="fas fa-chart-line"></i><p>No sales data yet</p></div>';}
+    else{pbc.innerHTML=pb.map(function(p){var c=ac(p.name),ip=p.profit>=0;return'<div class="pb-card"><div class="pb-top"><span class="pb-name">'+es(p.name)+'</span><span class="badge-status badge-profit"><i class="fas '+(ip?'fa-arrow-up':'fa-arrow-down')+'"></i> '+(ip?'+':'')+fm(p.profit)+'</span></div><div class="pb-vals"><div class="pb-row"><span>Sold</span><span>'+p.soldQty+' units</span></div><div class="pb-row"><span>Revenue</span><span>'+fm(p.revenue)+'</span></div><div class="pb-row"><span>Cost ('+fm(c)+'/unit)</span><span>'+fm(p.cost)+'</span></div><div class="pb-total"><span style="font-size:12px;color:var(--muted)">Net Profit</span><span class="num-highlight" style="color:'+(ip?'var(--profit)':'var(--loss)')+';font-size:16px">'+(ip?'+':'')+fm(p.profit)+'</span></div></div></div>';}).join('');}
+    var acts=[];
+    D.purchases.forEach(function(p){acts.push({type:'purchase',text:'Bought <strong>'+p.qty+'</strong> x <strong>'+es(p.product)+'</strong> at '+fm(p.unitPrice)+'/unit',date:p.date});});
+    D.sales.forEach(function(s){var pr=sp(s);acts.push({type:'sale',text:'Sold <strong>'+s.qty+'</strong> x <strong>'+es(s.product)+'</strong> to <strong>'+es(s.buyer)+'</strong> ('+(pr>=0?'+':'')+fm(pr)+')',date:s.date});});
+    acts.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var recent=acts.slice(0,8),ac2=document.getElementById('recentActivity');
+    if(!recent.length){ac2.innerHTML='<div class="empty-state" style="padding:24px"><i class="fas fa-clock-rotate-left"></i><p>No activity yet</p></div>';}
+    else{ac2.innerHTML=recent.map(function(a){return'<div class="activity-item"><div class="activity-dot" style="background:'+(a.type==='purchase'?'var(--blue)':'var(--accent)')+'"></div><div class="act-text">'+a.text+'</div><div class="act-date">'+fd(a.date)+'</div></div>';}).join('');}
+    var lc=document.getElementById('lowStockAlert'),ls2=S.lowStock||10,low=D.products.filter(function(p){return so(p.name)<=ls2;});
+    if(!low.length){lc.innerHTML='<div class="empty-state" style="padding:24px"><i class="fas fa-triangle-exclamation"></i><p>All stock OK</p></div>';}
+    else{lc.innerHTML=low.map(function(p){var st=so(p.name),e=st<=0;return'<div class="activity-item" style="'+(e?'border-color:rgba(248,113,113,0.3)':'border-color:rgba(251,146,60,0.3)')+'"><div class="activity-dot '+(e?'':'pulse-warn')+'" style="background:'+(e?'var(--red)':'var(--orange)')+'"></div><div class="act-text"><strong>'+es(p.name)+'</strong> — '+(e?'Out of stock!':'Only '+st+' left')+'</div></div>';}).join('');}
+  }
+
+  function rSet(){
+    document.getElementById('settingBizName').value=S.bizName||'';
+    document.getElementById('settingCurrency').value=S.currency||'₹';
+    document.getElementById('settingLowStock').value=S.lowStock||10;
+    var ub=[];D.sales.forEach(function(s){if(ub.indexOf(s.buyer.toLowerCase())===-1)ub.push(s.buyer.toLowerCase());});
+    document.getElementById('dataSummaryGrid').innerHTML='<div class="ds-item"><div class="ds-val">'+D.purchases.length+'</div><div class="ds-label">Purchases</div></div><div class="ds-item"><div class="ds-val">'+D.sales.length+'</div><div class="ds-label">Sales</div></div><div class="ds-item"><div class="ds-val">'+D.products.length+'</div><div class="ds-label">Products</div></div><div class="ds-item"><div class="ds-val">'+ub.length+'</div><div class="ds-label">Customers</div></div>';
+
+    var lastBackup=localStorage.getItem('milkpepsi_last_backup');
+    var reminder=document.getElementById('backupReminder');
+    var reminderText=document.getElementById('backupReminderText');
+    var lastBackupDateEl=document.getElementById('lastBackupDate');
+    if(!lastBackup){
+      reminder.style.display='block';
+      reminderText.innerHTML='You have <strong>never exported a backup</strong>. Export now to protect your data.';
+      lastBackupDateEl.textContent='Never exported';
+      lastBackupDateEl.style.color='var(--red)';
+    }else{
+      var daysSince=Math.floor((Date.now()-new Date(lastBackup).getTime())/(1000*60*60*24));
+      lastBackupDateEl.textContent=fd(lastBackup.split('T')[0]);
+      if(daysSince>=7){
+        reminder.style.display='block';
+        reminderText.innerHTML='Last backup was <strong>'+daysSince+' days ago</strong>. Export a fresh backup now.';
+        lastBackupDateEl.style.color='var(--orange)';
+      }else{
+        reminder.style.display='none';
+        lastBackupDateEl.style.color='var(--accent)';
+      }
+    }
+  }
+
+  document.getElementById('saveSettingsBtn').addEventListener('click',function(){S.bizName=document.getElementById('settingBizName').value.trim()||'Haxiz Manager';S.currency=document.getElementById('settingCurrency').value.trim()||'₹';S.lowStock=parseInt(document.getElementById('settingLowStock').value)||10;ss();updateBrand();toast('Settings saved','success');});
+
+  function doExport(){
+    var backup={version:2,app:'Haxiz Business Manager',exportedAt:new Date().toISOString(),settings:S,data:D};
+    var json=JSON.stringify(backup,null,2),blob=new Blob([json],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='haxiz_manager_backup_'+td()+'.json';a.click();URL.revokeObjectURL(url);
+    localStorage.setItem('milkpepsi_last_backup',new Date().toISOString());
+    toast('Data exported successfully','info');rSet();
+  }
+  document.getElementById('settingsExportBtn').addEventListener('click',doExport);
+  document.getElementById('reminderExportBtn').addEventListener('click',doExport);
+
+  document.getElementById('settingsImportBtn').addEventListener('click',function(){om('importModal');});
+  document.getElementById('importDropZone').addEventListener('click',function(){document.getElementById('importFileInput').click();});
+  document.getElementById('importFileInput').addEventListener('change',function(){if(this.files.length)handleImport(this.files[0]);this.value='';});
+  var dropZone=document.getElementById('importDropZone');
+  dropZone.addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag-over');});
+  dropZone.addEventListener('dragleave',function(){this.classList.remove('drag-over');});
+  dropZone.addEventListener('drop',function(e){e.preventDefault();this.classList.remove('drag-over');if(e.dataTransfer.files.length)handleImport(e.dataTransfer.files[0]);});
+
+  function handleImport(file){
+    if(!file.name.endsWith('.json')){toast('Please select a JSON file','error');return;}
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var imported=JSON.parse(e.target.result),importData,importSettings=null;
+        if(imported.data&&imported.settings){importData=imported.data;importSettings=imported.settings;}
+        else if(imported.purchases!==undefined){importData=imported;}
+        else{toast('Invalid backup file','error');return;}
+        var eIds={};D.purchases.forEach(function(p){eIds[p.id]=true;});var np=0;
+        if(importData.purchases&&Array.isArray(importData.purchases))importData.purchases.forEach(function(p){if(!eIds[p.id]){D.purchases.push(p);np++;}});
+        eIds={};D.sales.forEach(function(s){eIds[s.id]=true;});var ns=0;
+        if(importData.sales&&Array.isArray(importData.sales))importData.sales.forEach(function(s){if(!eIds[s.id]){D.sales.push(s);ns++;}});
+        var eNames={};D.products.forEach(function(p){eNames[p.name.toLowerCase()]=true;});
+        if(importData.products&&Array.isArray(importData.products))importData.products.forEach(function(p){if(!eNames[p.name.toLowerCase()])D.products.push(p);});
+        if(importSettings){if(importSettings.bizName)S.bizName=importSettings.bizName;if(importSettings.currency)S.currency=importSettings.currency;if(importSettings.lowStock)S.lowStock=importSettings.lowStock;ss();updateBrand();}
+        sv();cm('importModal');toast('Imported '+np+' purchases, '+ns+' sales','success');ref();ub();
+      }catch(err){toast('Failed to read file','error');}
+    };reader.readAsText(file);
+  }
+
+  function showConfirm(title,text,btnText,onConfirm){
+    document.getElementById('confirmTitle').textContent=title;document.getElementById('confirmText').innerHTML=text;
+    var btn=document.getElementById('confirmBtn');btn.textContent=btnText;btn.className='btn btn-danger';btn.style.flex='1';
+    btn.onclick=function(){cm('confirmModal');onConfirm();};om('confirmModal');
+  }
+  document.getElementById('settingsClearSalesBtn').addEventListener('click',function(){showConfirm('Clear All Sales','Permanently delete <strong>all '+D.sales.length+' sale records</strong>?','Clear Sales',function(){D.sales=[];sv();toast('All sales cleared','error');rSet();ub();});});
+  document.getElementById('settingsClearPurchasesBtn').addEventListener('click',function(){showConfirm('Clear All Purchases','Permanently delete <strong>all '+D.purchases.length+' purchase records</strong>? Stock & products will also reset.','Clear Purchases',function(){D.purchases=[];D.products=[];sv();toast('All purchases cleared','error');rSet();ub();});});
+  document.getElementById('settingsResetBtn').addEventListener('click',function(){showConfirm('Reset Everything','<strong style="color:var(--red)">Permanently delete ALL data.</strong> This cannot be undone.','Delete Everything',function(){D={purchases:[],sales:[],products:[]};S={bizName:'Haxiz Manager',currency:'₹',lowStock:10};sv();ss();updateBrand();toast('All data has been reset','error');rSet();ub();});});
+
+  function mpp(id){
+    var p=D.purchases.find(function(x){return x.id===id;});
+    if(p){
+      p.paid=true;
+      p.amountPaid=p.total;
+      p.amountDue=0;
+      sv();toast('Purchase marked as paid','info');ref();ub();
+    }
+  }
+  function msp(id){var s=D.sales.find(function(x){return x.id===id;});if(s){s.paid=true;sv();toast('Sale marked as collected','info');ref();ub();}}
+  function cd(t,id){
+    var it=t==='purchase'?D.purchases.find(function(x){return x.id===id;}):D.sales.find(function(x){return x.id===id;});
+    if(!it)return;var nm=t==='purchase'?it.product:it.buyer+' - '+it.product;
+    showConfirm('Delete '+t,'Delete this '+t+'?<br><strong>'+es(nm)+'</strong>','Delete',function(){
+      if(t==='purchase')D.purchases=D.purchases.filter(function(x){return x.id!==id;});else D.sales=D.sales.filter(function(x){return x.id!==id;});
+      sv();toast('Deleted','error');ref();ub();
+    });
+  }
+  function ref(){var a=document.querySelector('.page.active');if(a)go(a.id.replace('page-',''));}
+  function ub(){var c=D.purchases.filter(function(p){return !p.paid;}).length+D.sales.filter(function(s){return !s.paid;}).length;var b=document.getElementById('paymentBadge');if(c>0){b.style.display='inline';b.textContent=c;}else{b.style.display='none';}}
+
+  document.getElementById('qaPurchase').addEventListener('click',function(){om('purchaseModal');});
+  document.getElementById('qaSale').addEventListener('click',function(){om('saleModal');});
+  document.getElementById('addPurchaseBtn').addEventListener('click',function(){om('purchaseModal');});
+  document.getElementById('addSaleBtn').addEventListener('click',function(){om('saleModal');});
+  document.getElementById('purchaseSearch').addEventListener('input',rPur);
+  document.getElementById('purchaseFilter').addEventListener('change',rPur);
+  document.getElementById('saleSearch').addEventListener('input',rSal);
+  document.getElementById('saleFilter').addEventListener('change',rSal);
+  document.getElementById('customerSearch').addEventListener('input',rCus);
+
+  document.getElementById('pDate').value=td();document.getElementById('sDate').value=td();updateBrand();rDash();ub();
+})();
+</script>
+</body>
+</html>
   .nav-item i{width:20px;text-align:center;font-size:15px}
   .nav-item .badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;min-width:20px;text-align:center}
   .nav-divider{height:1px;background:var(--border);margin:8px 14px}
